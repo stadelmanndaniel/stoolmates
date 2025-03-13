@@ -5,17 +5,29 @@ declare global {
 }
 
 const prismaClientSingleton = () => {
+  if (!process.env.DATABASE_URL) {
+    throw new Error('DATABASE_URL is not set');
+  }
+
   return new PrismaClient({
-    log: ['error'],
+    log: ['error', 'warn'],
     datasources: {
       db: {
         url: process.env.DATABASE_URL,
       },
     },
+    errorFormat: 'pretty',
   });
 };
 
-const prisma = global.prisma ?? prismaClientSingleton();
+let prisma: PrismaClient;
+
+try {
+  prisma = global.prisma ?? prismaClientSingleton();
+} catch (error) {
+  console.error('Failed to initialize Prisma client:', error);
+  throw error;
+}
 
 if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma;
