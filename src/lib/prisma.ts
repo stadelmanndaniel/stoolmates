@@ -1,41 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 
-declare global {
-  var prisma: PrismaClient | undefined;
-}
-
 const prismaClientSingleton = () => {
-  if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL is not set');
-    return null;
-  }
-
-  try {
-    return new PrismaClient({
-      log: ['error', 'warn'],
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL,
-        },
-      },
-      errorFormat: 'pretty',
-    });
-  } catch (error) {
-    console.error('Failed to create Prisma client:', error);
-    return null;
-  }
+  return new PrismaClient({
+    log: ['error'],
+  });
 };
 
-let prisma: PrismaClient | null = null;
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
 
-try {
-  prisma = global.prisma ?? prismaClientSingleton();
-} catch (error) {
-  console.error('Failed to initialize Prisma client:', error);
-}
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClientSingleton | undefined;
+};
+
+const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
 if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma ?? undefined;
+  globalForPrisma.prisma = prisma;
 }
 
 export default prisma; 
