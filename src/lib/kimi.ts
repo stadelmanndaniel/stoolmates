@@ -1,6 +1,12 @@
-import { KIMI_API_KEY } from '@/lib/env';
+import { KIMI_API_KEY } from './env';
 
-export async function getShitChatContent() {
+export interface ShitChatContent {
+  content: string;
+  type: string;
+  source: string;
+}
+
+export async function getShitChatContent(): Promise<ShitChatContent> {
   try {
     const response = await fetch('https://api.kimi.moonshot.cn/v1/chat/completions', {
       method: 'POST',
@@ -12,32 +18,34 @@ export async function getShitChatContent() {
         messages: [
           {
             role: 'system',
-            content: 'You are a fun and engaging AI that provides interesting facts and jokes about bathroom activities. Keep the content light-hearted and appropriate.',
+            content: 'You are a fun and engaging AI that provides interesting facts and jokes about bathroom activities. Keep it light-hearted and appropriate.',
           },
           {
             role: 'user',
-            content: 'Generate a fun fact or joke about bathroom activities.',
+            content: 'Give me a fun fact or joke about bathroom activities.',
           },
         ],
         model: 'moonshot-v1-8k',
         temperature: 0.7,
+        max_tokens: 500,
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch content');
+      throw new Error('Failed to fetch shit chat content');
     }
 
     const data = await response.json();
     return {
       content: data.choices[0].message.content,
-      type: 'fact',
+      type: 'text',
       source: 'kimi',
     };
   } catch (error) {
+    console.error('Error fetching shit chat content:', error);
     return {
-      content: "Taking a break? Here's a fun fact: The average person spends about 3 years of their life on the toilet!",
-      type: 'fact',
+      content: 'Why did the toilet paper roll down the hill? To get to the bottom!',
+      type: 'text',
       source: 'fallback',
     };
   }

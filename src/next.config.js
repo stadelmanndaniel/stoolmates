@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
   reactStrictMode: true,
   swcMinify: true,
   async headers() {
@@ -41,6 +41,7 @@ const nextConfig = {
     }
     return config;
   },
-}
-
-module.exports = nextConfig; 
+  images: {
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
+  },
+} 

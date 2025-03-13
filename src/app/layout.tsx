@@ -6,7 +6,8 @@ import Providers from './providers';
 import Navbar from '@/components/layout/Navbar';
 import BottomNav from '@/components/layout/BottomNav';
 import { getServerSession } from 'next-auth';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
+import { SessionProvider } from 'next-auth/react';
 
 const inter = Inter({ subsets: ['latin'] });
 const outfit = Outfit({ 
@@ -37,19 +38,21 @@ export default async function RootLayout({
         <meta httpEquiv="Expires" content="0" />
       </head>
       <body className={`${inter.className} ${outfit.variable} font-sans`} suppressHydrationWarning>
-        <Providers>
-          <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 relative">
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.5)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-shimmer"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8)_0%,transparent_100%)]"></div>
-            <div className="relative flex flex-col flex-1">
-              <Navbar />
-              <main className="flex-1 pb-16">
-                {children}
-              </main>
-              {session && <BottomNav />}
+        <SessionProvider session={session}>
+          <Providers>
+            <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 relative">
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.5)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%] animate-shimmer"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8)_0%,transparent_100%)]"></div>
+              <div className="relative flex flex-col flex-1">
+                <Navbar />
+                <main className="flex-1 pb-16">
+                  {children}
+                </main>
+                {session && <BottomNav />}
+              </div>
             </div>
-          </div>
-        </Providers>
+          </Providers>
+        </SessionProvider>
       </body>
     </html>
   );
