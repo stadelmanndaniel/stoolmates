@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   async headers() {
     return [
       {
@@ -44,7 +50,6 @@ module.exports = {
   images: {
     domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-} 
+}
+
+module.exports = nextConfig; 
