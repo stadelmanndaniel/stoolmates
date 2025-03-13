@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && ESLINT_CONFIG_FILE=.eslintrc.build.json next build",
+    "build": "prisma generate && prisma db push && ESLINT_CONFIG_FILE=.eslintrc.build.json next build",
     "start": "next start",
     "lint": "next lint",
-    "db:seed": "ts-node prisma/seed.ts"
+    "db:seed": "ts-node prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
