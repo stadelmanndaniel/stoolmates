@@ -3,6 +3,15 @@ import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
+    if (!prisma) {
+      return NextResponse.json({
+        status: 'error',
+        database: 'disconnected',
+        error: 'Prisma client not initialized',
+        timestamp: new Date().toISOString(),
+      }, { status: 500 });
+    }
+
     // Test database connection
     await prisma.$queryRaw`SELECT 1`;
     
