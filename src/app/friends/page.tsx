@@ -42,7 +42,7 @@ export default function FriendsPage() {
       if (!response.ok) throw new Error('Failed to fetch friends');
       const data = await response.json();
       setFriends(data);
-    } catch {
+    } catch (_error) {
       // Handle error silently
     }
   };
@@ -53,7 +53,7 @@ export default function FriendsPage() {
       if (!response.ok) throw new Error('Failed to fetch friend requests');
       const data = await response.json();
       setFriendRequests(data);
-    } catch {
+    } catch (_error) {
       // Handle error silently
     }
   };
@@ -67,7 +67,7 @@ export default function FriendsPage() {
       });
       if (!response.ok) throw new Error('Failed to send friend request');
       router.refresh();
-    } catch {
+    } catch (_error) {
       // Handle error silently
     }
   };
@@ -80,7 +80,7 @@ export default function FriendsPage() {
       if (!response.ok) throw new Error('Failed to accept friend request');
       fetchFriends();
       fetchFriendRequests();
-    } catch {
+    } catch (_error) {
       // Handle error silently
     }
   };
@@ -92,7 +92,7 @@ export default function FriendsPage() {
       });
       if (!response.ok) throw new Error('Failed to reject friend request');
       fetchFriendRequests();
-    } catch {
+    } catch (_error) {
       // Handle error silently
     }
   };

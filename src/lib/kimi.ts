@@ -41,8 +41,8 @@ export async function getShitChatContent(): Promise<ShitChatContent> {
       type: 'text',
       source: 'kimi',
     };
-  } catch (error) {
-    console.error('Error fetching shit chat content:', error);
+  } catch (_error) {
+    console.error('Error fetching shit chat content:', _error);
     return {
       content: 'Why did the toilet paper roll down the hill? To get to the bottom!',
       type: 'text',

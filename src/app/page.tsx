@@ -23,7 +23,7 @@ export default function HomePage() {
       });
       if (!response.ok) throw new Error('Check-in failed');
       router.refresh();
-    } catch {
+    } catch (_error) {
       // Handle error silently
     } finally {
       setLoading(false);
