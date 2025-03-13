@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -36,20 +35,9 @@ const nextConfig = {
       },
     ];
   },
-  // Ensure consistent port usage
-  serverOptions: {
-    port: 3000
-  },
-  // Ensure we're using the same port in development
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      // Any custom webpack config for development
-    }
-    return config;
-  },
   images: {
     domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
   },
-}
+};
 
 module.exports = nextConfig; 
