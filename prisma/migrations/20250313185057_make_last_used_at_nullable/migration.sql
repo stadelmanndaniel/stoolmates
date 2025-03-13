@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "ShitChat" ALTER COLUMN "lastUsedAt" DROP NOT NULL,
+ALTER COLUMN "lastUsedAt" DROP DEFAULT;
