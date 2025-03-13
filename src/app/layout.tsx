@@ -6,7 +6,7 @@ import Providers from './providers';
 import Navbar from '@/components/layout/Navbar';
 import BottomNav from '@/components/layout/BottomNav';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { authOptions } from '../../lib/auth';
 import { SessionProvider } from 'next-auth/react';
 
 const inter = Inter({ subsets: ['latin'] });
