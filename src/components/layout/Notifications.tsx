@@ -31,11 +31,10 @@ export default function Notifications() {
   };
 
   useEffect(() => {
-    fetchRequests();
-    // Poll for new requests every 30 seconds
-    const interval = setInterval(fetchRequests, 30000);
-    return () => clearInterval(interval);
-  }, [session]);
+    if (session?.user) {
+      fetchRequests();
+    }
+  }, [session, fetchRequests]);
 
   if (requests.length === 0) return null;
 

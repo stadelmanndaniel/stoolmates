@@ -29,9 +29,6 @@ export default function FriendsPage() {
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<FriendRequest[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'pending' | 'sent'>('pending');
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
   const [pendingSentRequests, setPendingSentRequests] = useState<Set<string>>(new Set());
 
@@ -62,8 +59,7 @@ export default function FriendsPage() {
       if (!response.ok) throw new Error('Failed to fetch friends');
       const data = await response.json();
       setFriends(data || []);
-    } catch (err) {
-      setError('Failed to fetch friends');
+    } catch {
       setFriends([]);
     }
   };
@@ -74,8 +70,7 @@ export default function FriendsPage() {
       if (!response.ok) throw new Error('Failed to fetch friend requests');
       const data = await response.json();
       setReceivedRequests(data?.receivedRequests || []);
-    } catch (err) {
-      setError('Failed to fetch friend requests');
+    } catch {
       setReceivedRequests([]);
     }
   };
@@ -86,14 +81,12 @@ export default function FriendsPage() {
       if (!response.ok) throw new Error('Failed to fetch sent requests');
       const data = await response.json();
       setSentRequests(data?.requests || []);
-    } catch (err) {
-      setError('Failed to fetch sent requests');
+    } catch {
       setSentRequests([]);
     }
   };
 
   const sendFriendRequest = async (userId: string) => {
-    setLoading(true);
     try {
       const response = await fetch('/api/friends/requests', {
         method: 'POST',
@@ -101,17 +94,14 @@ export default function FriendsPage() {
         body: JSON.stringify({ friendId: userId }),
       });
       if (!response.ok) throw new Error('Failed to send friend request');
-      setPendingSentRequests(prev => new Set([...prev, userId]));
+      setPendingSentRequests(prev => new Set(Array.from(prev).concat(userId)));
       await Promise.all([fetchFriendRequests(), fetchSentRequests()]);
-    } catch (err) {
-      setError('Failed to send friend request');
-    } finally {
-      setLoading(false);
+    } catch {
+      // Handle error silently
     }
   };
 
   const acceptFriendRequest = async (requestId: string) => {
-    setLoading(true);
     try {
       const response = await fetch(`/api/friends/requests/${requestId}`, {
         method: 'PUT',
@@ -120,15 +110,12 @@ export default function FriendsPage() {
       });
       if (!response.ok) throw new Error('Failed to accept friend request');
       await Promise.all([fetchFriends(), fetchFriendRequests(), fetchSentRequests()]);
-    } catch (err) {
-      setError('Failed to accept friend request');
-    } finally {
-      setLoading(false);
+    } catch {
+      // Handle error silently
     }
   };
 
   const rejectFriendRequest = async (requestId: string) => {
-    setLoading(true);
     try {
       const response = await fetch(`/api/friends/requests/${requestId}`, {
         method: 'PUT',
@@ -137,25 +124,20 @@ export default function FriendsPage() {
       });
       if (!response.ok) throw new Error('Failed to reject friend request');
       await fetchFriendRequests();
-    } catch (err) {
-      setError('Failed to reject friend request');
-    } finally {
-      setLoading(false);
+    } catch {
+      // Handle error silently
     }
   };
 
   const removeFriend = async (friendId: string) => {
-    setLoading(true);
     try {
       const response = await fetch(`/api/friends/${friendId}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to remove friend');
       await fetchFriends();
-    } catch (err) {
-      setError('Failed to remove friend');
-    } finally {
-      setLoading(false);
+    } catch {
+      // Handle error silently
     }
   };
 
@@ -171,8 +153,8 @@ export default function FriendsPage() {
         if (!response.ok) throw new Error('Failed to search users');
         const data = await response.json();
         setSearchResults(data.users);
-      } catch (err) {
-        setError('Failed to search users');
+      } catch {
+        setSearchResults([]);
       }
     };
 

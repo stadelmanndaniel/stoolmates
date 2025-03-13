@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import type { JSX } from 'react';
 
 type TimeFrame = 'daily' | 'weekly';
 
@@ -19,7 +20,22 @@ export default function LeaderboardPage() {
   const [timeframe, setTimeframe] = useState<TimeFrame>('daily');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+
+  const fetchLeaderboard = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/leaderboard?timeframe=${timeframe}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setLeaderboard(data.leaderboard);
+      }
+    } catch {
+      // Handle error silently
+    } finally {
+      setLoading(false);
+    }
+  }, [timeframe]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -31,26 +47,7 @@ export default function LeaderboardPage() {
     if (session?.user) {
       fetchLeaderboard();
     }
-  }, [session, timeframe]);
-
-  const fetchLeaderboard = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const response = await fetch(`/api/leaderboard?timeframe=${timeframe}`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setLeaderboard(data.leaderboard);
-      } else {
-        setError(data.error || 'Failed to fetch leaderboard');
-      }
-    } catch (error) {
-      setError('An error occurred while fetching the leaderboard');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [session, fetchLeaderboard]);
 
   if (status === 'loading') {
     return (
@@ -104,45 +101,39 @@ export default function LeaderboardPage() {
             </div>
           </div>
 
-          {error ? (
-            <div className="p-4">
-              <div className="text-red-600">{error}</div>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {loading ? (
-                // Loading skeleton with same number of entries as current leaderboard
-                [...Array(leaderboard.length || 3)].map((_, index) => (
-                  <div key={index} className="p-3 flex items-center animate-pulse">
-                    <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full"></div>
-                    <div className="flex-grow ml-3">
-                      <div className="h-5 bg-gray-200 rounded w-1/3"></div>
-                    </div>
-                    <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full"></div>
+          <div className="divide-y divide-gray-200">
+            {loading ? (
+              // Loading skeleton with same number of entries as current leaderboard
+              [...Array(leaderboard.length || 3)].map((_, index) => (
+                <div key={index} className="p-3 flex items-center animate-pulse">
+                  <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full"></div>
+                  <div className="flex-grow ml-3">
+                    <div className="h-5 bg-gray-200 rounded w-1/3"></div>
                   </div>
-                ))
-              ) : (
-                leaderboard.map((entry, index) => (
-                  <div
-                    key={entry.id}
-                    className={getEntryClass(entry.isCurrentUser)}
-                  >
-                    <div className="flex-shrink-0 w-6 text-base font-bold text-gray-500">
-                      {index + 1}
-                    </div>
-                    <div className="flex-grow">
-                      <span className={getUsernameClass(entry.isCurrentUser)}>
-                        {entry.username}
-                      </span>
-                    </div>
-                    <div className="flex-shrink-0 text-xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                      {entry.checkInCount}
-                    </div>
+                  <div className="flex-shrink-0 w-6 h-6 bg-gray-200 rounded-full"></div>
+                </div>
+              ))
+            ) : (
+              leaderboard.map((entry, index) => (
+                <div
+                  key={entry.id}
+                  className={getEntryClass(entry.isCurrentUser)}
+                >
+                  <div className="flex-shrink-0 w-6 text-base font-bold text-gray-500">
+                    {index + 1}
                   </div>
-                ))
-              )}
-            </div>
-          )}
+                  <div className="flex-grow">
+                    <span className={getUsernameClass(entry.isCurrentUser)}>
+                      {entry.username}
+                    </span>
+                  </div>
+                  <div className="flex-shrink-0 text-xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
+                    {entry.checkInCount}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>

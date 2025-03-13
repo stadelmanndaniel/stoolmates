@@ -19,9 +19,6 @@ export const metadata: Metadata = {
   description: 'Connect with your stoolmates',
 };
 
-// Force a fresh render with a version number
-const APP_VERSION = '2.0.0';
-
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

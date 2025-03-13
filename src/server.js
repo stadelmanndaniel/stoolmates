@@ -1,52 +1,22 @@
-const { createServer } = require('http');
-const { parse } = require('url');
-const next = require('next');
+import express from 'express';
+import next from 'next';
+import { createServer } from 'http';
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
-let port = 3000;
-
-// Try alternative ports if 3000 is in use
-const findAvailablePort = (startPort) => {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.on('error', (err) => {
-      if (err.code === 'EADDRINUSE') {
-        server.close();
-        resolve(findAvailablePort(startPort + 1));
-      } else {
-        reject(err);
-      }
-    });
-    server.listen(startPort, () => {
-      server.close();
-      resolve(startPort);
-    });
-  });
-};
-
-const app = next({ dev, hostname });
+const app = next({ dev });
 const handle = app.getRequestHandler();
 
-app.prepare().then(async () => {
-  // Find an available port
-  port = await findAvailablePort(port);
+app.prepare().then(() => {
+  const server = express();
+  server.all('*', (req, res) => {
+    return handle(req, res);
+  });
 
-  createServer(async (req, res) => {
-    try {
-      const parsedUrl = parse(req.url, true);
-      await handle(req, res, parsedUrl);
-    } catch (err) {
-      console.error('Error occurred handling', req.url, err);
-      res.statusCode = 500;
-      res.end('Internal server error');
-    }
-  })
-    .once('error', (err) => {
-      console.error(err);
-      process.exit(1);
-    })
-    .listen(port, () => {
-      console.log(`> Ready on http://${hostname}:${port}`);
-    });
+  const httpServer = createServer(server);
+  const PORT = process.env.PORT || 3000;
+
+  httpServer.listen(PORT, (err) => {
+    if (err) throw err;
+    console.log(`> Ready on http://localhost:${PORT}`);
+  });
 }); 
