@@ -1,60 +1,34 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Session } from 'next-auth';
 
-export default function Navbar() {
-  const { data: session } = useSession();
-  const pathname = usePathname();
+interface NavbarProps {
+  session: Session | null;
+}
 
-  const isActive = (path: string) => pathname === path;
-
+export default function Navbar({ session }: NavbarProps) {
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link href="/" className="flex items-center">
-              <span className="text-2xl font-bold italic text-gray-900">stoolmates</span>
-            </Link>
-          </div>
-          <div className="flex items-center">
+    <nav className="bg-white shadow-sm">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          <Link href="/" className="text-xl font-bold text-gray-800">
+            Stoolmates
+          </Link>
+          <div className="flex items-center space-x-4">
             {session ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/friends"
-                  className={`text-sm font-medium ${
-                    isActive('/friends')
-                      ? 'text-violet-600'
-                      : 'text-gray-500 hover:text-gray-900'
-                  }`}
-                >
-                  friends
-                </Link>
-                <Link
-                  href="/leaderboard"
-                  className={`text-sm font-medium ${
-                    isActive('/leaderboard')
-                      ? 'text-violet-600'
-                      : 'text-gray-500 hover:text-gray-900'
-                  }`}
-                >
-                  leaderboard
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  sign out
-                </button>
-              </div>
+              <Link
+                href="/dashboard"
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Dashboard
+              </Link>
             ) : (
               <Link
-                href="/login"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900"
+                href="/auth/signin"
+                className="text-gray-600 hover:text-gray-900"
               >
-                sign in
+                Sign In
               </Link>
             )}
           </div>
